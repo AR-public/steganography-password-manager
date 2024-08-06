@@ -29,7 +29,7 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
         {({
           imageList,
           onImageUpload,
-          onImageRemoveAll,
+          // onImageRemoveAll,
           onImageUpdate,
           onImageRemove,
           isDragging,
