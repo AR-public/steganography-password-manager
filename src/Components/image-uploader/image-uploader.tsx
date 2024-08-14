@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import ImageUploading, { ImageListType } from "react-images-uploading";
+import React, { useState } from 'react';
+import ImageUploading, { ImageListType } from 'react-images-uploading';
 
 interface ImageUploaderProps {
   onImageChange: (images: ImageListType) => void;
@@ -9,10 +9,7 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
   const [images, setImages] = useState<ImageListType>([]);
   const maxNumber = 1;
 
-  const onChange = (
-    imageList: ImageListType,
-    addUpdateIndex: number[] | undefined
-  ) => {
+  const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     console.log(imageList, addUpdateIndex);
     setImages(imageList);
     onImageChange(imageList); // Notify the parent component of the change
@@ -20,12 +17,7 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
 
   return (
     <div className="ImageUploaderComponent">
-      <ImageUploading
-        multiple
-        value={images}
-        onChange={onChange}
-        maxNumber={maxNumber}
-      >
+      <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
         {({
           imageList,
           onImageUpload,
@@ -37,7 +29,7 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
         }) => (
           <div className="upload__image-wrapper">
             <button
-              style={isDragging ? { color: "red" } : undefined}
+              style={isDragging ? { color: 'red' } : undefined}
               onClick={onImageUpload}
               {...dragProps}
             >
@@ -46,11 +38,7 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
             &nbsp;
             {imageList.map((image, index) => (
               <div key={index} className="image-item">
-                <img
-                  src={image.dataURL}
-                  alt=""
-                  width="600"
-                />
+                <img src={image.dataURL} alt="" width="600" />
                 <div className="image-item__btn-wrapper">
                   <button onClick={() => onImageUpdate(index)}>Update</button>
                   <button onClick={() => onImageRemove(index)}>Remove</button>

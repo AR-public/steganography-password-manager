@@ -1,0 +1,36 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended" // Adds Prettier rules
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "tsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "prettier" // Adds Prettier as a plugin
+  ],
+
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+
+  "rules": {
+    "prettier/prettier": "error", // Enforces Prettier rules as ESLint errors
+    "react/react-in-jsx-scope": "off",
+    "react/react-in-tsx-scope": "off"
+  }
+}
