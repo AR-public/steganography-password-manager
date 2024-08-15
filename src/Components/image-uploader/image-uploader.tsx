@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 
-interface ImageUploaderProps {
-  onImageChange: (images: ImageListType) => void;
+interface ImageUploaderComponentProps {
+  latestUploadedImage: (image: ImageListType) => void;
 }
 
-export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
+// export function ImageUploaderComponent({ latestUploadedImage }) {
+const ImageUploaderComponent: React.FC<ImageUploaderComponentProps> = ({ latestUploadedImage }) => {
   const [images, setImages] = useState<ImageListType>([]);
   const maxNumber = 1;
 
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
     console.log(imageList, addUpdateIndex);
     setImages(imageList);
-    onImageChange(imageList); // Notify the parent component of the change
+    latestUploadedImage(imageList);
   };
 
   return (
@@ -50,4 +51,6 @@ export function ImageUploaderComponent({ onImageChange }: ImageUploaderProps) {
       </ImageUploading>
     </div>
   );
-}
+};
+
+export default ImageUploaderComponent;

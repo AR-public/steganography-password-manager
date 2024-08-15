@@ -1,20 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { ImageUploaderComponent } from './Components/image-uploader/image-uploader.tsx';
+import ImageUploaderComponent from './Components/image-uploader/image-uploader.tsx';
 import { ImageListType } from 'react-images-uploading';
 
 function App() {
   // Initialise State Variables
-  const [uploadedImagePipedIntoAppComponent, setUploadedImagePipedIntoAppComponent] =
-    useState<ImageListType>([]);
+  const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
   const [base64ImageCode, setBase64ImageCode] = useState<string>('');
 
-  // Handle image change from ImageUploaderComponent
-  const handleImageChange = (images: ImageListType) => {
-    setUploadedImagePipedIntoAppComponent(images);
+  const handleImageChange = (image: ImageListType) => {
+    setCurrentUploadedImage(image);
   };
 
-  // Extract base64 code from the image data URL
   const extractBase64CodeFromImageUploader = (
     longURLFromImageUploader: string | undefined
   ): string | undefined => {
@@ -33,29 +30,26 @@ function App() {
     }
   };
 
-  // Use effect to update base64ImageCode whenever the uploaded image changes
   useEffect(() => {
-    if (uploadedImagePipedIntoAppComponent[0]) {
-      const base64Code = extractBase64CodeFromImageUploader(
-        uploadedImagePipedIntoAppComponent[0].dataURL
-      );
+    if (currentUploadedImage[0]) {
+      const base64Code = extractBase64CodeFromImageUploader(currentUploadedImage[0].dataURL);
       if (base64Code) {
         setBase64ImageCode(base64Code);
       }
     }
-  }, [uploadedImagePipedIntoAppComponent]);
+  }, [currentUploadedImage]);
 
   return (
     <div className="App">
       <div className="image-uploader-component-div">
-        <ImageUploaderComponent onImageChange={handleImageChange} />
+        <ImageUploaderComponent latestUploadedImage={handleImageChange} />
       </div>
 
-      {uploadedImagePipedIntoAppComponent[0] && (
+      {currentUploadedImage[0] && (
         <>
           <p>This is the uploaded image returned in the parent component</p>
           <img
-            src={uploadedImagePipedIntoAppComponent[0].dataURL}
+            src={currentUploadedImage[0].dataURL}
             alt=""
             width="300"
             onClick={() => console.log(base64ImageCode)}

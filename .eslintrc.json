@@ -5,7 +5,7 @@
     "jest": true
   },
   "extends": [
-    "eslint:recommended",
+    // "eslint:recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended" // Adds Prettier rules
   ],
@@ -17,16 +17,13 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "react",
-    "prettier" // Adds Prettier as a plugin
-  ],
+  "plugins": ["react", "prettier", "@typescript-eslint"],
 
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
-    },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
 
   "rules": {
     "prettier/prettier": "error", // Enforces Prettier rules as ESLint errors
