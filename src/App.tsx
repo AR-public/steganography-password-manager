@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import ImageUploaderComponent from './Components/image-uploader/image-uploader.tsx';
 import { ImageListType } from 'react-images-uploading';
+import Login from './Components/image-uploader/credentials-form.tsx';
 
 function App() {
   // Initialise State Variables
@@ -55,6 +56,8 @@ function App() {
             onClick={() => console.log(base64ImageCode)}
           />
           <p>Base64 Image Code: {base64ImageCode}</p>
+
+          <Login />
         </>
       )}
     </div>
