@@ -4,6 +4,21 @@ import ImageUploaderComponent from './Components/image-uploader/image-uploader.t
 import { ImageListType } from 'react-images-uploading';
 import Login from './Components/image-uploader/credentials-form.tsx';
 
+// APP.tsx IDEAL FORMAT(?):
+
+// function App(){
+//
+// [imports]
+//
+// return (
+// <Component1>
+// <Component2>
+// <Component3>
+// <Component...>
+// )
+//
+// }
+
 function App() {
   // Initialise State Variables
   const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
