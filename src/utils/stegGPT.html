@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LSB Encoding and Decoding</title>
+  </head>
+  <body>
+    <!-- Encoding Interface -->
+    <h3>Encode Secret Message into Image</h3>
+    <input type="file" id="fileInput" accept="image/*" />
+    <canvas id="canvas" style="display: none"></canvas>
+    <br />
+    <input type="text" id="secretMessage" placeholder="Enter secret message" />
+    <button id="encodeButton">Encode Message</button>
+    <br />
+    <img id="outputImage" alt="Encoded Image" />
+
+    <!-- Decoding Interface -->
+    <h3>Decode Secret Message from Image</h3>
+    <input type="file" id="decodeInput" accept="image/*" />
+    <canvas id="decodeCanvas" style="display: none"></canvas>
+    <br />
+    <button id="decodeButton">Decode Message</button>
+    <p>Decoded Message: <span id="decodedMessage"></span></p>
+
+    <script src="lsbEncoding.js"></script>
+  </body>
+</html>

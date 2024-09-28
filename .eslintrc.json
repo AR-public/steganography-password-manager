@@ -28,6 +28,7 @@
   "rules": {
     "prettier/prettier": "error", // Enforces Prettier rules as ESLint errors
     "react/react-in-jsx-scope": "off",
-    "react/react-in-tsx-scope": "off"
+    "react/react-in-tsx-scope": "off",
+    "react/prop-types": "off"
   }
 }

@@ -5,13 +5,11 @@ interface ImageUploaderComponentProps {
   latestUploadedImage: (image: ImageListType) => void;
 }
 
-// export function ImageUploaderComponent({ latestUploadedImage }) {
 const ImageUploaderComponent: React.FC<ImageUploaderComponentProps> = ({ latestUploadedImage }) => {
   const [images, setImages] = useState<ImageListType>([]);
   const maxNumber = 1;
 
   const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
-    console.log(imageList, addUpdateIndex);
     setImages(imageList);
     latestUploadedImage(imageList);
   };
@@ -39,7 +37,7 @@ const ImageUploaderComponent: React.FC<ImageUploaderComponentProps> = ({ latestU
             &nbsp;
             {imageList.map((image, index) => (
               <div key={index} className="image-item">
-                <img src={image.dataURL} alt="" width="600" />
+                {/* <img src={image.dataURL} alt="" width="600" /> */}
                 <div className="image-item__btn-wrapper">
                   <button onClick={() => onImageUpdate(index)}>Update</button>
                   <button onClick={() => onImageRemove(index)}>Remove</button>
