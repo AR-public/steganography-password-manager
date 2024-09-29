@@ -5,6 +5,23 @@ import CredentialsForm from '../components/credentials-form.tsx';
 import { ImageListType } from 'react-images-uploading';
 
 export default function EncodeNewScreen({ onScreenChange }) {
+  interface CredentialRecord {
+    CredentialID: number;
+    DateAdded: string;
+    Service: string;
+    Username: string;
+    Password: string;
+  }
+  const allCredentials: CredentialRecord = [
+    {
+      CredentialID: 0,
+      DateAdded: '29/09/2024',
+      Service: 'Testflix +',
+      Username: 'agnon',
+      Password: 'Testflix_Password123'
+    }
+  ];
+
   // Initialise State Variables
   const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
 

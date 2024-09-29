@@ -2,50 +2,68 @@ import React, { useState } from 'react';
 
 export default function CredentialsForm() {
   const [serviceName, setServiceName] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+  let formContent:
+    | string
+    | number
+    | boolean
+    | React.JSX.Element
+    | Iterable<React.ReactNode>
+    | null
+    | undefined;
 
   const onButtonClick = () => {
-    setEmailError('');
+    // Reset errors before validation
+    let hasError = false;
     setPasswordError('');
+    setUsernameError('');
 
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      setEmailError('please enter a valid email address');
-      return;
+    // if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(username)) {
+    //   setUsernameError('Please enter a valid email address');
+    //   hasError = true;
+    // }
+
+    if (username === '') {
+      setUsernameError('Please enter your username');
+      hasError = true;
     }
 
+    // Validate password
     if (password.length < 5) {
-      setPasswordError('password must be 6 character or longer');
-    }
-
-    if (email === '') {
-      setEmailError('Please enter your email');
+      setPasswordError('Password must be 5 characters or longer');
+      hasError = true;
     }
 
     if (password === '') {
       setPasswordError('Please enter a password');
+      hasError = true;
     }
 
-    if (passwordError != '' || emailError != '') {
+    if (hasError) {
       return;
     }
 
-    if (email && password) {
-      const credentials = {
-        username: { email },
-        password: { password }
+    if (username && password) {
+      const singleCredential = {
+        service: serviceName,
+        username: username,
+        password: password,
+        dateAdded: Date.now()
       };
 
-      console.log('Login Credentials:', credentials);
-
-      return credentials;
+      console.log('Login Credentials:', singleCredential);
+      setIsFormSubmitted(true);
+      return singleCredential;
     }
   };
 
-  return (
-    <div className="credentials-form">
+  if (!isFormSubmitted) {
+    formContent = (
       <form>
         <input
           value={serviceName}
@@ -54,11 +72,11 @@ export default function CredentialsForm() {
         />
 
         <input
-          value={email}
-          placeholder="Enter email address here"
-          onChange={(ev) => setEmail(ev.target.value)}
+          value={username}
+          placeholder="Enter username for service"
+          onChange={(ev) => setUsername(ev.target.value)}
         />
-        <label className="errorLabel">{emailError}</label>
+        <label className="errorLabel">{usernameError}</label>
 
         <input
           value={password}
@@ -69,6 +87,28 @@ export default function CredentialsForm() {
 
         <input onClick={onButtonClick} className={'inputButton'} type="button" value={'Submit'} />
       </form>
-    </div>
-  );
+    );
+  } else {
+    formContent = (
+      <div>
+        <label className="submittedService">
+          <b>Service:</b> {serviceName}{' '}
+        </label>
+        <label className="submittedUsername">
+          <b>Username:</b> {username}{' '}
+        </label>
+        <label className="submittedPassword">
+          <b>Password:</b> {password}{' '}
+        </label>
+        <input
+          onClick={() => setIsFormSubmitted(false)}
+          className={'editFormButton'}
+          type="button"
+          value={'Edit'}
+        />
+      </div>
+    );
+  }
+
+  return <div className="credentials-form">{formContent}</div>;
 }
