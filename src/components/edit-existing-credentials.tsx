@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface TempCredentialRecord {
   CredentialID?: number; //make mandatory once testing is complete
@@ -29,7 +29,7 @@ let initialisedTempCredential: TempCredentialRecord = {
   Password: ''
 };
 
-export default function CredentialsForm({
+export default function ExistingCredentialForms({
   childID,
   existingCredential,
   sendSingleCredential
@@ -44,22 +44,16 @@ export default function CredentialsForm({
   const [tempCredential, setTempCredential] =
     useState<TempCredentialRecord>(initialisedTempCredential);
 
-  let formContent:
-    | string
-    | number
-    | boolean
-    | React.JSX.Element
-    | Iterable<React.ReactNode>
-    | null
-    | undefined;
-
-  if (existingCredential) {
-    setTempCredential(existingCredential);
-    setServiceName(existingCredential.Service);
-    setUsername(existingCredential.Username);
-    setPassword(existingCredential.Password);
-    setIsFormSubmitted(true);
-  }
+  // Use useEffect to initialize state based on existingCredential, avoiding an infinite loop
+  useEffect(() => {
+    if (existingCredential) {
+      setTempCredential(existingCredential);
+      setServiceName(existingCredential.Service);
+      setUsername(existingCredential.Username);
+      setPassword(existingCredential.Password);
+      setIsFormSubmitted(true);
+    }
+  }, []); // No changes here as per your request
 
   function createFinalCredential() {
     setTempCredential({
@@ -84,7 +78,7 @@ export default function CredentialsForm({
     setServiceNameError('');
 
     if (serviceName === '') {
-      setServiceNameError('Please enter your username');
+      setServiceNameError('Please enter your service name');
       hasError = true;
     }
 
@@ -103,9 +97,9 @@ export default function CredentialsForm({
     }
 
     if (
-      serviceName != existingCredential?.Service ||
-      username != existingCredential?.Username ||
-      password != existingCredential?.Password
+      serviceName !== existingCredential?.Service ||
+      username !== existingCredential?.Username ||
+      password !== existingCredential?.Password
     ) {
       createFinalCredential();
       sendSingleCredential({ childID, credential: tempCredential });
@@ -115,26 +109,32 @@ export default function CredentialsForm({
   }
 
   if (!isFormSubmitted) {
-    formContent = (
+    return (
       <form>
         <input
-          value={tempCredential.Service}
+          value={serviceName}
           placeholder="Enter the name of a service"
           onChange={(ev) => setServiceName(ev.target.value)}
         />
         <label className="errorLabel">{serviceNameError}</label>
 
         <input
-          value={tempCredential.Username}
+          value={username}
           placeholder="Enter username for service"
           onChange={(ev) => setUsername(ev.target.value)}
         />
         <label className="errorLabel">{usernameError}</label>
 
         <input
-          value={tempCredential.Password}
+          value={password}
           placeholder="Enter password here"
-          onChange={(ev) => setPassword(ev.target.value)}
+          onChange={(ev) => {
+            const newPassword = ev.target.value;
+            // Prevent spaces in the password
+            if (!/\s/.test(newPassword)) {
+              setPassword(newPassword);
+            }
+          }}
         />
         <label className="errorLabel">{passwordError}</label>
 
@@ -142,16 +142,16 @@ export default function CredentialsForm({
       </form>
     );
   } else {
-    formContent = (
+    return (
       <div>
         <label className="submittedService">
-          <b>Service:</b> {tempCredential?.Service}{' '}
+          <b>Service:</b> {serviceName}{' '}
         </label>
         <label className="submittedUsername">
-          <b>Username:</b> {tempCredential?.Username}{' '}
+          <b>Username:</b> {username}{' '}
         </label>
         <label className="submittedPassword">
-          <b>Password:</b> {tempCredential?.Password}{' '}
+          <b>Password:</b> {password}{' '}
         </label>
         <input
           onClick={() => setIsFormSubmitted(false)}
@@ -162,6 +162,4 @@ export default function CredentialsForm({
       </div>
     );
   }
-
-  return <div className="credentials-form">{formContent}</div>;
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 interface TempCredentialRecord {
-  CredentialID?: number; //make mandatory once testing is complete
-  DateAdded?: Date; //make mandatory once testing is complete
+  CredentialID?: number;
+  DateAdded?: Date;
   DateAddedMilliseconds: number;
   DateUpdated?: Date | null;
   DateUpdatedMilliseconds?: number | null;
@@ -14,7 +14,6 @@ interface TempCredentialRecord {
 
 interface ItemProps {
   childID: number | undefined;
-  existingCredential?: TempCredentialRecord;
   sendSingleCredential: (data: {
     childID: number | undefined;
     credential: TempCredentialRecord;
@@ -29,11 +28,7 @@ let initialisedTempCredential: TempCredentialRecord = {
   Password: ''
 };
 
-export default function CredentialsForm({
-  childID,
-  existingCredential,
-  sendSingleCredential
-}: ItemProps) {
+export default function AddNewCredentialsForm({ childID, sendSingleCredential }: ItemProps) {
   const [serviceName, setServiceName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -53,23 +48,10 @@ export default function CredentialsForm({
     | null
     | undefined;
 
-  if (existingCredential) {
-    setTempCredential(existingCredential);
-    setServiceName(existingCredential.Service);
-    setUsername(existingCredential.Username);
-    setPassword(existingCredential.Password);
-    setIsFormSubmitted(true);
-  }
-
   function createFinalCredential() {
     setTempCredential({
-      CredentialID: existingCredential?.CredentialID,
-      DateAdded: existingCredential ? existingCredential.DateAdded : new Date(Date.now()),
-      DateAddedMilliseconds: existingCredential
-        ? existingCredential.DateAddedMilliseconds
-        : Date.now(),
-      DateUpdated: existingCredential ? new Date(Date.now()) : null,
-      DateUpdatedMilliseconds: existingCredential ? Date.now() : null,
+      DateAdded: new Date(Date.now()),
+      DateAddedMilliseconds: Date.now(),
       Service: serviceName,
       Username: username,
       Password: password
@@ -84,7 +66,7 @@ export default function CredentialsForm({
     setServiceNameError('');
 
     if (serviceName === '') {
-      setServiceNameError('Please enter your username');
+      setServiceNameError('Please enter your service name');
       hasError = true;
     }
 
@@ -102,15 +84,8 @@ export default function CredentialsForm({
       return;
     }
 
-    if (
-      serviceName != existingCredential?.Service ||
-      username != existingCredential?.Username ||
-      password != existingCredential?.Password
-    ) {
-      createFinalCredential();
-      sendSingleCredential({ childID, credential: tempCredential });
-    }
-
+    createFinalCredential();
+    sendSingleCredential({ childID, credential: tempCredential });
     setIsFormSubmitted(true);
   }
 
@@ -118,23 +93,29 @@ export default function CredentialsForm({
     formContent = (
       <form>
         <input
-          value={tempCredential.Service}
+          value={serviceName}
           placeholder="Enter the name of a service"
           onChange={(ev) => setServiceName(ev.target.value)}
         />
         <label className="errorLabel">{serviceNameError}</label>
 
         <input
-          value={tempCredential.Username}
+          value={username}
           placeholder="Enter username for service"
           onChange={(ev) => setUsername(ev.target.value)}
         />
         <label className="errorLabel">{usernameError}</label>
 
         <input
-          value={tempCredential.Password}
+          value={password}
           placeholder="Enter password here"
-          onChange={(ev) => setPassword(ev.target.value)}
+          onChange={(ev) => {
+            const newPassword = ev.target.value;
+            // Prevent spaces in the password
+            if (!/\s/.test(newPassword)) {
+              setPassword(newPassword);
+            }
+          }}
         />
         <label className="errorLabel">{passwordError}</label>
 
@@ -145,13 +126,13 @@ export default function CredentialsForm({
     formContent = (
       <div>
         <label className="submittedService">
-          <b>Service:</b> {tempCredential?.Service}{' '}
+          <b>Service:</b> {serviceName}{' '}
         </label>
         <label className="submittedUsername">
-          <b>Username:</b> {tempCredential?.Username}{' '}
+          <b>Username:</b> {username}{' '}
         </label>
         <label className="submittedPassword">
-          <b>Password:</b> {tempCredential?.Password}{' '}
+          <b>Password:</b> {password}{' '}
         </label>
         <input
           onClick={() => setIsFormSubmitted(false)}
