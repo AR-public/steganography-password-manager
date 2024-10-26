@@ -76,6 +76,7 @@ export default function EncodeNewScreen({ onScreenChange }) {
   const [singleCredentialEntry, setSingleCredentialEntry] = useState<SingleCredentialRecord>(
     allCredentials[0] //allCredentials[0] is being used to initialise singleCredentialEntry so the type doesn't fall back to 'undefined'
   );
+  const [isNewCredentialFormVisible, setNewCredentialFormVisible] = useState(false);
 
   //Initialise Global Variables
   let allIDs: [number];
@@ -108,7 +109,16 @@ export default function EncodeNewScreen({ onScreenChange }) {
     credential: SingleCredentialRecord;
   }) {
     const { childID, credential } = data;
+    console.log('This is the submitted new credential:', credential);
     setSingleCredentialEntry(credential);
+  }
+
+  function showNewCredentialForm() {
+    setNewCredentialFormVisible(true);
+  }
+
+  function hideNewCredentialForm() {
+    setNewCredentialFormVisible(false);
   }
 
   return (
@@ -129,60 +139,25 @@ export default function EncodeNewScreen({ onScreenChange }) {
                 sendSingleCredential={receiveSingleCredential}
               />
             ))}
-            <AddNewCredentialsForm
-              key={1}
-              sendSingleCredential={receiveSingleCredential}
-              childID={undefined}
-            />
-
+            <button
+              className="add-new-credential-button"
+              onClick={showNewCredentialForm}
+              disabled={isNewCredentialFormVisible}
+            >
+              Add New
+            </button>
             <button className="save-button">Save</button>
+            {isNewCredentialFormVisible && (
+              <AddNewCredentialsForm
+                key={1}
+                childID={undefined}
+                sendSingleCredential={receiveSingleCredential}
+                enableAddNewButton={hideNewCredentialForm}
+              />
+            )}
           </>
         )}
       </div>
     </div>
   );
 }
-
-// onSubmit ->
-
-// 0.5 stamp the credential with the child form it came from ✅
-
-// 1. Send temp credential to parent ✅
-
-// 2. Add credential to queue
-// Check if credential with same child stamp exists in queue
-// If no: concat with queue
-// If yes: re-write queue entry
-
-// onSave ->
-
-// 1. Assign ID to all queue items
-// Checks for ID ✅
-// If yes: nothing ✅
-// If no: Assign ID ✅
-
-// 2. .map the queue items and add them to allCredentials
-
-// 2. For each, check if the ID exists already
-// If yes: re-write that entry
-// If no:  concat with allCredentials
-
-//-----------------------------------------------------------------------
-
-// *** Display order is out of scope for now ***
-
-// function assignDisplayOrderToCredentialQueue() {}
-
-// function orderCredentialQueueByDisplayOrder() {
-//   credentialQueue.sort((a, b) => a.DisplayOrder - b.DisplayOrder);
-// }
-
-// <AddNewCredentialsForm/> - "This will pass up a new list of credentials"
-// If we provide an ID to each form, this will allow each new credential
-// to be added to the same queue as existing credentials
-
-// Write a function that checks allCredentials and puts all the ID's in an array called allIDs
-// ExistingCredentials will not have any use for allIDs
-// NewCredentials will use allIDs to check for the next available ID
-// Once a new credential form is created, the next available ID will be assigned to it and added to allIDs
-// When 'save' is pressed, allIDs[] will be reset
