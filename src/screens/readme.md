@@ -16,3 +16,7 @@
 
 - If not, a unique ID will be assigned to it
 - If yes, the incoming credential will simply overwrite the credential with the same ID in the queue. (added to the end if the ID is unique)
+
+See under 'New' in the architecture diagram for a flow chart of the queue:
+
+![alt text for screen readers](/Queueing-architecture.jpg 'Queing architecture')
