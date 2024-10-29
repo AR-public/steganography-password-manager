@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
 
-interface TempCredentialRecord {
-  CredentialID?: number;
-  DateAdded?: Date;
+export interface NewCredentialRecord {
+  DateAdded: Date;
   DateAddedMilliseconds: number;
-  DateUpdated?: Date | null;
-  DateUpdatedMilliseconds?: number | null;
   Service: string;
   Username: string;
   Password: string;
-  DisplayOrder?: number;
 }
 
 interface ItemProps {
-  childID: number | undefined;
-  sendSingleCredential: (data: {
-    childID: number | undefined;
-    credential: TempCredentialRecord;
-  }) => void;
+  sendSingleCredential: (credential: NewCredentialRecord) => void;
   enableAddNewButton: () => void;
 }
 
-let initialisedTempCredential: TempCredentialRecord = {
+let initialisedTempCredential: NewCredentialRecord = {
   DateAdded: new Date(Date.now()),
   DateAddedMilliseconds: 0,
   Service: '',
@@ -30,7 +22,6 @@ let initialisedTempCredential: TempCredentialRecord = {
 };
 
 export default function AddNewCredentialsForm({
-  childID,
   sendSingleCredential,
   enableAddNewButton
 }: ItemProps) {
@@ -42,7 +33,7 @@ export default function AddNewCredentialsForm({
   const [passwordError, setPasswordError] = useState('');
   // const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [tempCredential, setTempCredential] =
-    useState<TempCredentialRecord>(initialisedTempCredential);
+    useState<NewCredentialRecord>(initialisedTempCredential);
 
   let validSubmission: boolean;
 
@@ -56,7 +47,6 @@ export default function AddNewCredentialsForm({
     | undefined;
 
   function resetErrors() {
-    // Reset errors before validation
     validSubmission = true;
     setPasswordError('');
     setUsernameError('');
@@ -105,7 +95,7 @@ export default function AddNewCredentialsForm({
     if (!validateFormInputs()) return;
 
     const finalCredential = createFinalCredential();
-    sendSingleCredential({ childID, credential: finalCredential });
+    sendSingleCredential(finalCredential);
     // setIsFormSubmitted(true);
     enableAddNewButton();
     resetFormValues();

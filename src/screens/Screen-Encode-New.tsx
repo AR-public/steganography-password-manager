@@ -4,39 +4,34 @@ import DisplayUserImage from '../components/image-display.tsx';
 import ExistingCredentialForms from '../components/edit-existing-credentials.tsx';
 import { ImageListType } from 'react-images-uploading';
 import AddNewCredentialsForm from '../components/submit-new-credentials.tsx';
+import { NewCredentialRecord } from '../components/submit-new-credentials.tsx';
+export interface SingleCredentialRecord {
+  CredentialID: number;
+  DateAdded?: Date; //make mandatory once testing is complete
+  DateAddedMilliseconds: number;
+  Service: string;
+  Username: string;
+  Password: string;
+}
 
 export default function EncodeNewScreen({ onScreenChange }) {
-  interface SingleCredentialRecord {
-    CredentialID?: number; //make mandatory once testing is complete
-    DateAdded?: Date; //make mandatory once testing is complete
-    DateAddedMilliseconds: number;
-    DateUpdated?: Date | null;
-    DateUpdatedMilliseconds?: number | null;
-    Service: string;
-    Username: string;
-    Password: string;
-    DisplayOrder?: number;
-    childID?: number;
-  }
-
   type AllCredentialsRecord = SingleCredentialRecord[];
 
+  //Global Variables
   let allCredentials: AllCredentialsRecord = [
     {
       CredentialID: 1,
       DateAddedMilliseconds: 1727677736118,
       Service: 'Testflix +',
       Username: 'agnon',
-      Password: 'Testflix_Password123',
-      DisplayOrder: 1
+      Password: 'Testflix_Password123'
     },
     {
       CredentialID: 2,
       DateAddedMilliseconds: 1727677736118,
       Service: 'YToob Premium',
       Username: 'agnon',
-      Password: 'YToob_Password123',
-      DisplayOrder: 2
+      Password: 'YToob_Password123'
     },
     {
       CredentialID: 5,
@@ -47,71 +42,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
     }
   ];
 
-  // One Thing Functions:
-  function compileExistingIDs(array) {
-    return array.map((credential) => credential.CredentialID);
-  }
-
-  function getNextID(arr: any[]) {
-    // Sort the array in ascending order
-    arr.sort((a, b) => a - b);
-
-    // Iterate from 1 onward and check each position for the expected number
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i] !== i + 1) {
-        return i + 1; // Return the next missing number in the sequence
-      }
-    }
-
-    // If no gap was found, return the next number in the sequence
-    return arr.length + 1;
-  }
-
-  function addNewIDToAllIDs(newID: number) {
-    allIDs.push(newID);
-  }
-
-  // Initialise State Variables
+  // State Variables
   const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
-  const [singleCredentialEntry, setSingleCredentialEntry] = useState<SingleCredentialRecord>(
-    allCredentials[0] //allCredentials[0] is being used to initialise singleCredentialEntry so the type doesn't fall back to 'undefined'
-  );
+  const [credentialQueue, setCredentialQueue] = useState<AllCredentialsRecord>(allCredentials);
   const [isNewCredentialFormVisible, setNewCredentialFormVisible] = useState(false);
 
-  //Initialise Global Variables
-  let allIDs: [number];
-
-  let credentialQueue: AllCredentialsRecord;
-
-  function handleImageChange(image: ImageListType) {
-    setCurrentUploadedImage(image);
-  }
-
-  function addToCredentialQueue(receivedCredential) {
-    // rewrite any existing ID's
-    const allQueueIDs = compileExistingIDs(credentialQueue);
-    if (allQueueIDs.includes(receivedCredential)) {
-    } else {
-      credentialQueue = credentialQueue.concat(singleCredentialEntry);
-    }
-  }
-
-  function assignCredentialID() {
-    if (!singleCredentialEntry.CredentialID) {
-      const allExistingIDs = compileExistingIDs(allCredentials);
-      const nextAvailableID = getNextID(allExistingIDs);
-      singleCredentialEntry.CredentialID = nextAvailableID;
-    } else return;
-  }
-
-  function receiveSingleCredential(data: {
-    childID: number | undefined;
-    credential: SingleCredentialRecord;
-  }) {
-    const { childID, credential } = data;
-    console.log('This is the submitted new credential:', credential);
-    setSingleCredentialEntry(credential);
-  }
+  // One Thing Functions:
 
   function showNewCredentialForm() {
     setNewCredentialFormVisible(true);
@@ -119,6 +55,94 @@ export default function EncodeNewScreen({ onScreenChange }) {
 
   function hideNewCredentialForm() {
     setNewCredentialFormVisible(false);
+  }
+
+  function idExistsInQueue(id: number): boolean {
+    return credentialQueue.some((credential) => credential.CredentialID === id);
+  }
+
+  function overwriteCredentialInQueue(newCredential: SingleCredentialRecord): void {
+    setCredentialQueue((prevQueue) => {
+      // Find the index of the item with the matching CredentialID
+      const index = prevQueue.findIndex(
+        (credential) => credential.CredentialID === newCredential.CredentialID
+      );
+
+      // If an item with the matching ID is found, create a new array with the updated credential
+      if (index !== -1) {
+        // Create a shallow copy of the previous queue array
+        const updatedQueue = [...prevQueue];
+        // Replace the item at the found index with the new credential
+        updatedQueue[index] = newCredential;
+
+        return updatedQueue;
+      }
+
+      // If no matching ID is found, return the previous state unchanged
+      return prevQueue;
+    });
+  }
+
+  function findNextAvailableID(credentials: AllCredentialsRecord): number {
+    // Sort the array by CredentialID to ensure it’s in ascending order
+    const sortedCredentials = credentials.sort((a, b) => a.CredentialID - b.CredentialID);
+
+    // Start checking from ID = 1
+    let expectedID = 1;
+
+    for (const credential of sortedCredentials) {
+      // If there’s a gap in the sequence, return the expected ID
+      if (credential.CredentialID !== expectedID) {
+        return expectedID;
+      }
+      // Otherwise, increment expectedID to check the next in sequence
+      expectedID++;
+    }
+
+    // If no gaps were found, return the next ID after the highest one
+    return expectedID;
+  }
+
+  function assignIDToNewCredential(newCredential: NewCredentialRecord | SingleCredentialRecord) {
+    //newCredential switches structure from one interface to another
+    const newID = findNextAvailableID(credentialQueue);
+    const newCredentialWithID = {
+      CredentialID: newID,
+      ...newCredential
+    };
+    return newCredentialWithID;
+  }
+
+  function concatNewCredentialToQueue(newCredential: SingleCredentialRecord) {
+    setCredentialQueue(credentialQueue.concat(newCredential));
+  }
+
+  function writeCredentialQueueToDatabase() {
+    allCredentials = credentialQueue;
+  }
+
+  function onSave() {
+    writeCredentialQueueToDatabase();
+    console.log('This is allCredentials after the Queue has updated them:', allCredentials);
+  }
+
+  // handle functions
+  function handleImageChange(image: ImageListType) {
+    setCurrentUploadedImage(image);
+  }
+
+  function handleEditedCredential(editedCredential: SingleCredentialRecord) {
+    if (idExistsInQueue(editedCredential.CredentialID)) {
+      console.log('Success! This ID exists in the Queue and can be overwritten');
+      overwriteCredentialInQueue(editedCredential);
+    } else {
+      throw new Error("ERR: Edited credential doesn't exist in database. Logic has failed");
+    }
+  }
+
+  function handleNewCredential(newCredential: NewCredentialRecord) {
+    let newCredentialWithID: SingleCredentialRecord = assignIDToNewCredential(newCredential);
+    concatNewCredentialToQueue(newCredentialWithID);
   }
 
   return (
@@ -131,12 +155,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
           <>
             <DisplayUserImage currentUploadedImage={currentUploadedImage} />
             <h2>Login Credentials</h2>
-            {allCredentials.map((existingCredential) => (
+            {credentialQueue.map((existingCredential) => (
               <ExistingCredentialForms
                 key={existingCredential.CredentialID}
                 childID={existingCredential.CredentialID}
                 existingCredential={existingCredential}
-                sendSingleCredential={receiveSingleCredential}
+                sendSingleCredential={handleEditedCredential}
               />
             ))}
             <button
@@ -146,12 +170,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
             >
               Add New
             </button>
-            <button className="save-button">Save</button>
+            <button className="save-button" onClick={onSave}>
+              Save
+            </button>
             {isNewCredentialFormVisible && (
               <AddNewCredentialsForm
-                key={1}
-                childID={undefined}
-                sendSingleCredential={receiveSingleCredential}
+                sendSingleCredential={handleNewCredential}
                 enableAddNewButton={hideNewCredentialForm}
               />
             )}

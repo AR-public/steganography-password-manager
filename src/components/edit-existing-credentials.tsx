@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from 'react';
-
-interface TempCredentialRecord {
-  CredentialID?: number; //make mandatory once testing is complete
-  DateAdded?: Date; //make mandatory once testing is complete
-  DateAddedMilliseconds: number;
-  DateUpdated?: Date | null;
-  DateUpdatedMilliseconds?: number | null;
-  Service: string;
-  Username: string;
-  Password: string;
-  DisplayOrder?: number;
-}
+import { SingleCredentialRecord } from '../screens/Screen-Encode-New';
 
 interface ItemProps {
   childID: number | undefined;
-  existingCredential?: TempCredentialRecord;
-  sendSingleCredential: (data: {
-    childID: number | undefined;
-    credential: TempCredentialRecord;
-  }) => void;
+  existingCredential: SingleCredentialRecord;
+  sendSingleCredential: (credential: SingleCredentialRecord) => void;
 }
 
-let initialisedTempCredential: TempCredentialRecord = {
+let initialisedTempCredential: SingleCredentialRecord = {
+  CredentialID: Math.random(),
   DateAdded: new Date(Date.now()),
   DateAddedMilliseconds: 0,
   Service: '',
@@ -30,7 +17,6 @@ let initialisedTempCredential: TempCredentialRecord = {
 };
 
 export default function ExistingCredentialForms({
-  childID,
   existingCredential,
   sendSingleCredential
 }: ItemProps) {
@@ -42,7 +28,7 @@ export default function ExistingCredentialForms({
   const [passwordError, setPasswordError] = useState('');
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [tempCredential, setTempCredential] =
-    useState<TempCredentialRecord>(initialisedTempCredential);
+    useState<SingleCredentialRecord>(initialisedTempCredential);
 
   // Use useEffect to initialize state based on existingCredential, avoiding an infinite loop
   useEffect(() => {
@@ -53,21 +39,22 @@ export default function ExistingCredentialForms({
       setPassword(existingCredential.Password);
       setIsFormSubmitted(true);
     }
-  }, []); // No changes here as per your request
+  }, []);
 
   function createFinalCredential() {
-    setTempCredential({
+    const editedCredential = {
       CredentialID: existingCredential?.CredentialID,
       DateAdded: existingCredential ? existingCredential.DateAdded : new Date(Date.now()),
       DateAddedMilliseconds: existingCredential
         ? existingCredential.DateAddedMilliseconds
         : Date.now(),
-      DateUpdated: existingCredential ? new Date(Date.now()) : null,
-      DateUpdatedMilliseconds: existingCredential ? Date.now() : null,
       Service: serviceName,
       Username: username,
       Password: password
-    });
+    };
+
+    setTempCredential(editedCredential);
+    return editedCredential;
   }
 
   function onSubmit() {
@@ -101,8 +88,8 @@ export default function ExistingCredentialForms({
       username !== existingCredential?.Username ||
       password !== existingCredential?.Password
     ) {
-      createFinalCredential();
-      sendSingleCredential({ childID, credential: tempCredential });
+      const finalCredential = createFinalCredential();
+      sendSingleCredential(finalCredential);
     }
 
     setIsFormSubmitted(true);

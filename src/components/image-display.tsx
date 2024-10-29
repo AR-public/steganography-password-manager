@@ -6,7 +6,6 @@ interface Props {
 }
 
 function DisplayUserImage({ currentUploadedImage }: Props) {
-  console.log('currentUploadedImage:', currentUploadedImage);
   return <img src={currentUploadedImage[0]?.dataURL} alt="Uploaded Image" width="800" />;
 }
 
