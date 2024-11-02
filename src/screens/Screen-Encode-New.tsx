@@ -5,6 +5,7 @@ import ExistingCredentialForms from '../components/edit-existing-credentials.tsx
 import { ImageListType } from 'react-images-uploading';
 import AddNewCredentialsForm from '../components/submit-new-credentials.tsx';
 import { NewCredentialRecord } from '../components/submit-new-credentials.tsx';
+import MasterPasswordModal from '../components/master-password-scrim.tsx';
 export interface SingleCredentialRecord {
   CredentialID: number;
   DateAdded?: Date; //make mandatory once testing is complete
@@ -168,6 +169,10 @@ export default function EncodeNewScreen({ onScreenChange }) {
     );
   }
 
+  function handleMasterPasswordModalSubmit(masterPassword: string) {
+    console.log('Password submitted:', masterPassword);
+  }
+
   return (
     <div>
       <h1>You must be new here. Welcome</h1>
@@ -210,6 +215,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
               />
             )}
           </>
+        )}
+        {isMasterPasswordModalOpen && (
+          <MasterPasswordModal
+            onClose={() => setIsMasterPasswordModalOpen(false)}
+            onSubmit={handleMasterPasswordModalSubmit}
+          />
         )}
       </div>
     </div>
