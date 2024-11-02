@@ -1,6 +1,6 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
 body {
   margin: 0;
@@ -12,31 +12,4 @@ body {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
-
-button {
-  /* Reset background and border */
-  background-color: buttonface;
-  color: buttontext;
-  border: 1px solid;
-  border-color: ButtonBorder;
-  padding: 2px 6px;
-  font-size: 100%;
-  line-height: normal;
-  font-family: inherit;
-  cursor: pointer;
-
-  /* Restore browser's default appearance */
-  appearance: button;
-  -webkit-appearance: button;
-}
-
-h1 {
-  font-size: 2em; /* Default h1 font size */
-  font-weight: bold; /* Default bold weight */
-  margin-top: 0.67em; /* Default top margin */
-  margin-bottom: 0.67em; /* Default bottom margin */
-  line-height: 1.2; /* Typical line height */
-  color: inherit; /* Inherit text color from parent */
-  font-family: inherit; /* Inherit font from parent */
 }

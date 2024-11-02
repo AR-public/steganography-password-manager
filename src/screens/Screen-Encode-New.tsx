@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ImageUploaderComponent from '../components/image-uploader.tsx';
 import DisplayUserImage from '../components/image-display.tsx';
 import ExistingCredentialForms from '../components/edit-existing-credentials.tsx';
@@ -45,8 +45,20 @@ export default function EncodeNewScreen({ onScreenChange }) {
   // State Variables
   const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
   const [credentialQueue, setCredentialQueue] = useState<AllCredentialsRecord>(allCredentials);
+  const [isEncodeButtonEnabled, setIsEncodeButtonEnabled] = useState(false);
   const [isNewCredentialFormVisible, setIsNewCredentialFormVisible] = useState(false);
   const [isMasterPasswordModalOpen, setIsMasterPasswordModalOpen] = useState(false);
+
+  // Ref to store the initial credentialQueue value
+  const initialCredentialQueue = useRef(allCredentials);
+
+  // Effect to detect changes in credentialQueue
+  useEffect(() => {
+    // Check if the current credentialQueue is different from the initial one
+    const hasQueueChanged =
+      JSON.stringify(credentialQueue) !== JSON.stringify(initialCredentialQueue.current);
+    setIsEncodeButtonEnabled(hasQueueChanged);
+  }, [credentialQueue]);
 
   // One Thing Functions:
 
@@ -185,10 +197,11 @@ export default function EncodeNewScreen({ onScreenChange }) {
             <button className="save-button" onClick={onSave}>
               Save
             </button>
-
-            <button className="encode-button" onClick={onEcode}>
-              Encode Credentials to Image
-            </button>
+            {credentialQueue.length > 0 && (
+              <button className="encode-button" onClick={onEcode} disabled={!isEncodeButtonEnabled}>
+                Encode Credentials to Image
+              </button>
+            )}
 
             {isNewCredentialFormVisible && (
               <AddNewCredentialsForm
