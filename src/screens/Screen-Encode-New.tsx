@@ -45,16 +45,17 @@ export default function EncodeNewScreen({ onScreenChange }) {
   // State Variables
   const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
   const [credentialQueue, setCredentialQueue] = useState<AllCredentialsRecord>(allCredentials);
-  const [isNewCredentialFormVisible, setNewCredentialFormVisible] = useState(false);
+  const [isNewCredentialFormVisible, setIsNewCredentialFormVisible] = useState(false);
+  const [isMasterPasswordModalOpen, setIsMasterPasswordModalOpen] = useState(false);
 
   // One Thing Functions:
 
   function showNewCredentialForm() {
-    setNewCredentialFormVisible(true);
+    setIsNewCredentialFormVisible(true);
   }
 
   function hideNewCredentialForm() {
-    setNewCredentialFormVisible(false);
+    setIsNewCredentialFormVisible(false);
   }
 
   function idExistsInQueue(id: number): boolean {
@@ -126,6 +127,10 @@ export default function EncodeNewScreen({ onScreenChange }) {
     console.log('This is allCredentials after the Queue has updated them:', allCredentials);
   }
 
+  function onEcode() {
+    setIsMasterPasswordModalOpen(true);
+  }
+
   // handle functions
   function handleImageChange(image: ImageListType) {
     setCurrentUploadedImage(image);
@@ -145,6 +150,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
     concatNewCredentialToQueue(newCredentialWithID);
   }
 
+  function handleDeleteCredential(credentialID: number) {
+    setCredentialQueue(
+      credentialQueue.filter((credential) => credential.CredentialID !== credentialID) //remove any credentials with this ID
+    );
+  }
+
   return (
     <div>
       <h1>You must be new here. Welcome</h1>
@@ -161,6 +172,7 @@ export default function EncodeNewScreen({ onScreenChange }) {
                 childID={existingCredential.CredentialID}
                 existingCredential={existingCredential}
                 sendSingleCredential={handleEditedCredential}
+                deleteSingleCredential={handleDeleteCredential}
               />
             ))}
             <button
@@ -173,6 +185,11 @@ export default function EncodeNewScreen({ onScreenChange }) {
             <button className="save-button" onClick={onSave}>
               Save
             </button>
+
+            <button className="encode-button" onClick={onEcode}>
+              Encode Credentials to Image
+            </button>
+
             {isNewCredentialFormVisible && (
               <AddNewCredentialsForm
                 sendSingleCredential={handleNewCredential}

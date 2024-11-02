@@ -5,6 +5,7 @@ interface ItemProps {
   childID: number | undefined;
   existingCredential: SingleCredentialRecord;
   sendSingleCredential: (credential: SingleCredentialRecord) => void;
+  deleteSingleCredential: (credentialID: number) => void;
 }
 
 let initialisedTempCredential: SingleCredentialRecord = {
@@ -18,7 +19,8 @@ let initialisedTempCredential: SingleCredentialRecord = {
 
 export default function ExistingCredentialForms({
   existingCredential,
-  sendSingleCredential
+  sendSingleCredential,
+  deleteSingleCredential
 }: ItemProps) {
   const [serviceName, setServiceName] = useState('');
   const [username, setUsername] = useState('');
@@ -43,7 +45,7 @@ export default function ExistingCredentialForms({
 
   function createFinalCredential() {
     const editedCredential = {
-      CredentialID: existingCredential?.CredentialID,
+      CredentialID: existingCredential.CredentialID,
       DateAdded: existingCredential ? existingCredential.DateAdded : new Date(Date.now()),
       DateAddedMilliseconds: existingCredential
         ? existingCredential.DateAddedMilliseconds
@@ -95,6 +97,10 @@ export default function ExistingCredentialForms({
     setIsFormSubmitted(true);
   }
 
+  function onDelete() {
+    deleteSingleCredential(existingCredential.CredentialID);
+  }
+
   if (!isFormSubmitted) {
     return (
       <form>
@@ -142,9 +148,15 @@ export default function ExistingCredentialForms({
         </label>
         <input
           onClick={() => setIsFormSubmitted(false)}
-          className="edit-form-button"
+          className="edit-credential-button"
           type="button"
           value="Edit"
+        />
+        <input
+          onClick={onDelete}
+          className="delete-credential-button"
+          type="button"
+          value="Delete"
         />
       </div>
     );
