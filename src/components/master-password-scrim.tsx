@@ -69,7 +69,6 @@ const MasterPasswordModal: React.FC<MasterPasswordModalProps> = ({ onClose, onSu
           name="username"
           autoComplete="username"
           className="sr-only"
-          aria-hidden="true"
           tabIndex={-1} // Makes it non-focusable
         ></input>
         <input

@@ -1,54 +1,37 @@
 import React, { useState } from 'react';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
 
-interface ImageUploaderComponentProps {
-  latestUploadedImage: (image: ImageListType) => void;
-}
+type ImageUploaderProps = {
+  onImageUpload: (imageDataUrl: string) => void; // Callback function to pass the image data URL to the parent
+};
 
-const ImageUploaderComponent: React.FC<ImageUploaderComponentProps> = ({ latestUploadedImage }) => {
-  const [images, setImages] = useState<ImageListType>([]);
-  const maxNumber = 1;
+const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageUpload }) => {
+  const [previewUrl, setPreviewUrl] = useState<string>('');
 
-  const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
-    setImages(imageList);
-    latestUploadedImage(imageList);
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result as string;
+        setPreviewUrl(dataUrl); // Set preview in the uploader
+        onImageUpload(dataUrl); // Send image data URL to the parent
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
-    <div className="ImageUploaderComponent">
-      <ImageUploading multiple value={images} onChange={onChange} maxNumber={maxNumber}>
-        {({
-          imageList,
-          onImageUpload,
-          // onImageRemoveAll,
-          onImageUpdate,
-          onImageRemove,
-          isDragging,
-          dragProps
-        }) => (
-          <div className="upload__image-wrapper">
-            <button
-              style={isDragging ? { color: 'red' } : undefined}
-              onClick={onImageUpload}
-              {...dragProps}
-            >
-              Click or Drop here
-            </button>
-            &nbsp;
-            {imageList.map((image, index) => (
-              <div key={index} className="image-item">
-                {/* <img src={image.dataURL} alt="" width="600" /> */}
-                <div className="image-item__btn-wrapper">
-                  <button onClick={() => onImageUpdate(index)}>Update</button>
-                  <button onClick={() => onImageRemove(index)}>Remove</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </ImageUploading>
+    <div>
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      {previewUrl && (
+        <img
+          src={previewUrl}
+          alt="Uploaded Preview"
+          style={{ maxWidth: '100%', marginTop: '10px' }}
+        />
+      )}
     </div>
   );
 };
 
-export default ImageUploaderComponent;
+export default ImageUploader;

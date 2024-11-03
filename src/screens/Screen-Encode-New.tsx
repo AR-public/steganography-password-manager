@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ImageUploaderComponent from '../components/image-uploader.tsx';
-import DisplayUserImage from '../components/image-display.tsx';
+import ImageUploader from '../components/image-uploader.tsx';
 import ExistingCredentialForms from '../components/edit-existing-credentials.tsx';
-import { ImageListType } from 'react-images-uploading';
 import AddNewCredentialsForm from '../components/submit-new-credentials.tsx';
 import { NewCredentialRecord } from '../components/submit-new-credentials.tsx';
 import MasterPasswordModal from '../components/master-password-scrim.tsx';
+import { encodeImageWithLSB } from '../utils/lsb-functions.ts';
+import EncodedScreen from './Encoded-Screen.tsx';
 export interface SingleCredentialRecord {
   CredentialID: number;
   DateAdded?: Date; //make mandatory once testing is complete
@@ -44,11 +44,15 @@ export default function EncodeNewScreen({ onScreenChange }) {
   ];
 
   // State Variables
-  const [currentUploadedImage, setCurrentUploadedImage] = useState<ImageListType>([]);
+  const [currentUploadedImageDataURL, setCurrentUploadedImageDataURL] = useState<string>('');
   const [credentialQueue, setCredentialQueue] = useState<AllCredentialsRecord>(allCredentials);
   const [isEncodeButtonEnabled, setIsEncodeButtonEnabled] = useState(false);
   const [isNewCredentialFormVisible, setIsNewCredentialFormVisible] = useState(false);
   const [isMasterPasswordModalOpen, setIsMasterPasswordModalOpen] = useState(false);
+  const [encodedImageDataURL, setEncodedImageDataURL] = useState<string>(
+    currentUploadedImageDataURL
+  );
+  const [showEncodedScreen, setShowEncodedScreen] = useState(false);
 
   // Ref to store the initial credentialQueue value
   const initialCredentialQueue = useRef(allCredentials);
@@ -145,8 +149,8 @@ export default function EncodeNewScreen({ onScreenChange }) {
   }
 
   // handle functions
-  function handleImageChange(image: ImageListType) {
-    setCurrentUploadedImage(image);
+  function handleImageChange(imageURL: string) {
+    setCurrentUploadedImageDataURL(imageURL);
   }
 
   function handleEditedCredential(editedCredential: SingleCredentialRecord) {
@@ -169,8 +173,20 @@ export default function EncodeNewScreen({ onScreenChange }) {
     );
   }
 
-  function handleMasterPasswordModalSubmit(masterPassword: string) {
-    console.log('Password submitted:', masterPassword);
+  async function handleMasterPasswordModalSubmit(masterPassword: string) {
+    console.log('Master password submitted:', masterPassword);
+    try {
+      const LSBOutput = await encodeImageWithLSB(
+        currentUploadedImageDataURL,
+        credentialQueue,
+        masterPassword
+      );
+      setEncodedImageDataURL(LSBOutput);
+      setShowEncodedScreen(true);
+      console.log('Rendering Encoded Screen');
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -178,10 +194,9 @@ export default function EncodeNewScreen({ onScreenChange }) {
       <h1>You must be new here. Welcome</h1>
       <div className="ImageEncoder">
         <button onClick={() => onScreenChange('home')}>Home</button>
-        <ImageUploaderComponent latestUploadedImage={handleImageChange} />
-        {currentUploadedImage[0] && (
+        <ImageUploader onImageUpload={handleImageChange} />
+        {currentUploadedImageDataURL[0] && (
           <>
-            <DisplayUserImage currentUploadedImage={currentUploadedImage} />
             <h2>Login Credentials</h2>
             {credentialQueue.map((existingCredential) => (
               <ExistingCredentialForms
@@ -222,6 +237,7 @@ export default function EncodeNewScreen({ onScreenChange }) {
             onSubmit={handleMasterPasswordModalSubmit}
           />
         )}
+        {showEncodedScreen && <EncodedScreen encodedImageDataURL={encodedImageDataURL} />}
       </div>
     </div>
   );
