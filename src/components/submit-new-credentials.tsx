@@ -131,7 +131,14 @@ export default function AddNewCredentialsForm({
       />
       <label className="errorLabel">{passwordError}</label>
 
-      <input onClick={onSubmit} className={'inputButton'} type="button" value={'Submit'} />
+      <input
+        onClick={onSubmit}
+        className={
+          'inputButton ml-2 bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300'
+        }
+        type="button"
+        value={'Submit'}
+      />
     </form>
   );
   // } else {

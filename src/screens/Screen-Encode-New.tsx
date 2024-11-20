@@ -3,7 +3,7 @@ import ImageUploader from '../components/image-uploader.tsx';
 import ExistingCredentialForms from '../components/edit-existing-credentials.tsx';
 import AddNewCredentialsForm from '../components/submit-new-credentials.tsx';
 import { NewCredentialRecord } from '../components/submit-new-credentials.tsx';
-import MasterPasswordModal from '../components/master-password-scrim.tsx';
+import MasterPasswordModal from '../components/master-password-scrim-create.tsx';
 import { encodeImageWithLSB } from '../utils/lsb-functions.ts';
 import EncodedScreen from './Encoded-Screen.tsx';
 export interface SingleCredentialRecord {
@@ -193,7 +193,12 @@ export default function EncodeNewScreen({ onScreenChange }) {
     <div>
       <h1>You must be new here. Welcome</h1>
       <div className="ImageEncoder">
-        <button onClick={() => onScreenChange('home')}>Home</button>
+        <button
+          className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300"
+          onClick={() => onScreenChange('home')}
+        >
+          Home
+        </button>
         <ImageUploader onImageUpload={handleImageChange} />
         {currentUploadedImageDataURL[0] && (
           <>
@@ -208,17 +213,24 @@ export default function EncodeNewScreen({ onScreenChange }) {
               />
             ))}
             <button
-              className="add-new-credential-button"
+              className="add-new-credential-button mr-2 bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300"
               onClick={showNewCredentialForm}
               disabled={isNewCredentialFormVisible}
             >
               Add New
             </button>
-            <button className="save-button" onClick={onSave}>
+            <button
+              className="save-button bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300"
+              onClick={onSave}
+            >
               Save
             </button>
             {credentialQueue.length > 0 && (
-              <button className="encode-button" onClick={onEcode} disabled={!isEncodeButtonEnabled}>
+              <button
+                className="encode-button ml-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300"
+                onClick={onEcode}
+                disabled={!isEncodeButtonEnabled}
+              >
                 Encode Credentials to Image
               </button>
             )}
