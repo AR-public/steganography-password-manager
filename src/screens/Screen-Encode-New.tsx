@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ImageUploader from '../components/image-uploader.tsx';
 import ExistingCredentialForms from '../components/edit-existing-credentials.tsx';
-import AddNewCredentialsForm from '../components/submit-new-credentials.tsx';
-import { NewCredentialRecord } from '../components/submit-new-credentials.tsx';
-import MasterPasswordModal from '../components/master-password-scrim-create.tsx';
+import AddNewCredentialsForm from '../components/submit-new-credential.tsx';
+import { NewCredentialRecord } from '../components/submit-new-credential.tsx';
+import MasterPasswordModal from '../components/master-password-scrim.tsx';
 import { encodeImageWithLSB } from '../utils/lsb-functions.ts';
 import EncodedScreen from './Encoded-Screen.tsx';
 export interface SingleCredentialRecord {
@@ -14,34 +14,11 @@ export interface SingleCredentialRecord {
   Username: string;
   Password: string;
 }
+export type AllCredentialsRecord = SingleCredentialRecord[];
 
 export default function EncodeNewScreen({ onScreenChange }) {
-  type AllCredentialsRecord = SingleCredentialRecord[];
-
   //Global Variables
-  let allCredentials: AllCredentialsRecord = [
-    {
-      CredentialID: 1,
-      DateAddedMilliseconds: 1727677736118,
-      Service: 'Testflix +',
-      Username: 'agnon',
-      Password: 'Testflix_Password123'
-    },
-    {
-      CredentialID: 2,
-      DateAddedMilliseconds: 1727677736118,
-      Service: 'YToob Premium',
-      Username: 'agnon',
-      Password: 'YToob_Password123'
-    },
-    {
-      CredentialID: 5,
-      DateAddedMilliseconds: 1727677736118,
-      Service: 'YToob Basic',
-      Username: 'agnon',
-      Password: 'YToob_Password123'
-    }
-  ];
+  let allCredentials: AllCredentialsRecord = [];
 
   // State Variables
   const [currentUploadedImageDataURL, setCurrentUploadedImageDataURL] = useState<string>('');
@@ -139,10 +116,10 @@ export default function EncodeNewScreen({ onScreenChange }) {
     allCredentials = credentialQueue;
   }
 
-  function onSave() {
-    writeCredentialQueueToDatabase();
-    console.log('This is allCredentials after the Queue has updated them:', allCredentials);
-  }
+  // function onSave() {
+  //   writeCredentialQueueToDatabase();
+  //   console.log('This is allCredentials after the Queue has updated them:', allCredentials);
+  // }
 
   function onEcode() {
     setIsMasterPasswordModalOpen(true);
@@ -165,6 +142,8 @@ export default function EncodeNewScreen({ onScreenChange }) {
   function handleNewCredential(newCredential: NewCredentialRecord) {
     let newCredentialWithID: SingleCredentialRecord = assignIDToNewCredential(newCredential);
     concatNewCredentialToQueue(newCredentialWithID);
+    writeCredentialQueueToDatabase();
+    console.log('This is allCredentials after the Queue has updated them:', allCredentials);
   }
 
   function handleDeleteCredential(credentialID: number) {
@@ -183,7 +162,6 @@ export default function EncodeNewScreen({ onScreenChange }) {
       );
       setEncodedImageDataURL(LSBOutput);
       setShowEncodedScreen(true);
-      console.log('Rendering Encoded Screen');
     } catch (error) {
       console.error(error);
     }
@@ -191,18 +169,23 @@ export default function EncodeNewScreen({ onScreenChange }) {
 
   return (
     <div>
-      <h1>You must be new here. Welcome</h1>
-      <div className="ImageEncoder">
-        <button
-          className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300"
-          onClick={() => onScreenChange('home')}
-        >
-          Home
-        </button>
+      {showEncodedScreen || (
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">You must be new here. Welcome</h1>
+      )}
+      <button
+        className="mb-5 bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300"
+        onClick={() => onScreenChange('home')}
+      >
+        Home
+      </button>
+
+      <div className="ImageEncoder w-full max-w-md mx-auto">
         <ImageUploader onImageUpload={handleImageChange} />
-        {currentUploadedImageDataURL[0] && (
+        {currentUploadedImageDataURL && (
           <>
-            <h2>Login Credentials</h2>
+            <h2 className="block text-3xl font-medium text-gray-700 mt-8 mb-8 ">
+              Login Credentials
+            </h2>
             {credentialQueue.map((existingCredential) => (
               <ExistingCredentialForms
                 key={existingCredential.CredentialID}
@@ -213,18 +196,22 @@ export default function EncodeNewScreen({ onScreenChange }) {
               />
             ))}
             <button
-              className="add-new-credential-button mr-2 bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300"
+              className={
+                isNewCredentialFormVisible
+                  ? 'add-new-credential-button mr-2 bg-gray-300 text-gray-500 font-medium py-2 px-4 rounded-lg shadow cursor-not-allowed'
+                  : 'add-new-credential-button mr-2 bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300'
+              }
               onClick={showNewCredentialForm}
               disabled={isNewCredentialFormVisible}
             >
-              Add New
+              Add Credential
             </button>
-            <button
+            {/* <button
               className="save-button bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition duration-300"
               onClick={onSave}
             >
               Save
-            </button>
+            </button> */}
             {credentialQueue.length > 0 && (
               <button
                 className="encode-button ml-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300"
@@ -239,6 +226,7 @@ export default function EncodeNewScreen({ onScreenChange }) {
               <AddNewCredentialsForm
                 sendSingleCredential={handleNewCredential}
                 enableAddNewButton={hideNewCredentialForm}
+                onCancel={hideNewCredentialForm}
               />
             )}
           </>
@@ -249,8 +237,8 @@ export default function EncodeNewScreen({ onScreenChange }) {
             onSubmit={handleMasterPasswordModalSubmit}
           />
         )}
-        {showEncodedScreen && <EncodedScreen encodedImageDataURL={encodedImageDataURL} />}
       </div>
+      {showEncodedScreen && <EncodedScreen encodedImageDataURL={encodedImageDataURL} />}
     </div>
   );
 }

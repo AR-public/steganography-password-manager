@@ -58,7 +58,7 @@ const MasterPasswordModal: React.FC<MasterPasswordModalProps> = ({ onClose, onSu
   return (
     <dialog
       ref={dialogRef}
-      className="password-modal bg-white p-6 rounded shadow-md max-w-xs w-full"
+      className="master-password-modal bg-white p-6 rounded shadow-md max-w-xs w-full"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Enter Master Password</h2>
@@ -73,6 +73,7 @@ const MasterPasswordModal: React.FC<MasterPasswordModalProps> = ({ onClose, onSu
         ></input>
         <input
           type="password"
+          id="master-password-input"
           value={password}
           onChange={(e) => setPassword(e.target.value)} // No longer clearing errors on change
           placeholder="Enter master password"
